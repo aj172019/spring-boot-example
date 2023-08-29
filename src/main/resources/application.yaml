@@ -1,0 +1,214 @@
+####----------------------------------
+## Server - Servlet Container
+####----------------------------------
+server:
+  tomcat:
+    connection-timeout: 2800
+    keep-alive-timeout: -1
+    max-keep-alive-requests: -1
+    threads:
+      max: 200
+      min-spare: 200
+  accept-count: 100
+  shutdown: graceful
+
+
+
+####----------------------------------
+## Spring
+####----------------------------------
+spring:
+  #### Basic
+  profiles.active: local
+  application:
+    name: shop
+
+  lifecycle.timeout-per-shutdown-phase: 1m
+  h2.console.enabled: true
+
+  #### DataSource
+  datasource:
+    groups:
+      basic:
+        primary: true
+        reader:
+          url: jdbc:log4jdbc:h2:mem:testdb
+          username: ENC(g1Tdt3j8hxw1qkwl/o5VbaITq9+dM8wzVYVSEUlQTK8S0PNkLzv4I8uGvcDke7xT)
+        writer:
+          url: jdbc:log4jdbc:h2:mem:testdb
+          username: ENC(g1Tdt3j8hxw1qkwl/o5VbaITq9+dM8wzVYVSEUlQTK8S0PNkLzv4I8uGvcDke7xT)
+          hikari:
+            minimum-idle: 5
+            maximum-pool-size: 5
+      demo:
+        writer:
+          url: jdbc:log4jdbc:h2:mem:testdb
+          username: ENC(g1Tdt3j8hxw1qkwl/o5VbaITq9+dM8wzVYVSEUlQTK8S0PNkLzv4I8uGvcDke7xT)
+    hikari:
+      minimum-idle: 20
+      maximum-pool-size: 20
+      connection-timeout: 2700
+      validation-timeout: 2100
+      leak-detection-threshold: 59000
+      max-lifetime: 60000
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 500
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        rewriteBatchedStatements: true  #saveAll 성능 개선
+
+  #### Spring Data
+  data:
+    #### JPA
+    #nothing
+
+    #### Redis
+    redis:
+      host: localhost
+      #cluster:
+      #  nodes: localhost
+      timeout: 500ms
+      connect-timeout: 200ms
+      lettuce:
+        pool:
+          min-idle: 8
+
+  #### Spring Cloud
+  cloud:
+    #### Open Feign
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 2000
+            read-timeout: 2000
+            logger-level: BASIC
+          member: ## Sample - Member Service
+            url: ${other-service.services.member.url}
+            logger-level: FULL
+          product: ## Sample - Product Service
+            url: ${other-service.services.product.url}
+            logger-level: FULL
+          order: ## Sample - Order Service
+            url: ${other-service.services.order.url}
+            logger-level: FULL
+          review: ## Sample - Review Service
+            url: ${other-service.services.review.url}
+            logger-level: FULL
+
+  #### Kafka
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: ${spring.application.name}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+  #### TaskExecutor
+  task:
+    #### @Scheduled
+    scheduling:
+      pool.size: 5
+      #thread-name-prefix: scheduling-
+      shutdown:
+        await-termination: true
+        await-termination-period: 30
+
+    #### @Async
+    execution:
+      pool:
+        core-size: 20
+        max-size: 50
+        queue-capacity: 100
+      #thread-name-prefix: task-
+      shutdown:
+        await-termination: true
+        await-termination-period: 30
+
+
+
+####----------------------------------
+## Other Service
+####----------------------------------
+other-service:
+  services:
+    member: ## Sample - Member Service
+      url: http://member.mall.example.co.kr
+    product: ## Sample - Product Service
+      url: http://product.mall.example.co.kr
+    order: ## Sample - Order Service
+      url: http://order.mall.example.co.kr
+    review: ## Sample - Review Service
+      url: http://review.mall.example.co.kr
+
+
+
+####----------------------------------
+## Scheduling Management
+####----------------------------------
+scheduling:
+  enabled: false
+  groups:
+    demoA:
+      enabled: true
+    demoB:
+      enabled: false
+
+
+
+####----------------------------------
+## Logging
+####----------------------------------
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{traceId:-},%X{spanId:-}][%X{userId:-}][%X{userIp:-}]"
+  level:
+    #root: info
+    com.megazone.springbootboilerplate: debug
+    com.megazone.springbootboilerplate.feign: debug
+    org.springframework.web: info
+    jdbc:
+      sqlonly: debug
+      sqltiming: debug
+      resultsettable: debug
+      audit: off
+      resultset: off
+      connection: off
+
+
+
+####----------------------------------
+## Actuator
+####----------------------------------
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+  tracing:
+    sampling:
+      probability: 1.0 # 모든 tracing 기록
+  server:
+    port: 8081
+
+#  # prometheus http_server_requests_seconds_bucket metric 활성화
+#  metrics:
+#    distribution:
+#      percentiles-histogram:
+#        http:
+#          server:
+#            requests: true
+
+#   # file logging
+#  file:
+#    name: logs/application.log
+#  logback:
+#    rollingpolicy:
+#      file-name-pattern: logs/application-%d{yyyyMMdd}.%i.log
+#      max-history: 5

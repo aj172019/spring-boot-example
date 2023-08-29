@@ -1,0 +1,243 @@
+openapi: 3.0.1
+info:
+  title: REST API 문서
+  description: REST API 문서
+  version: 0.0.1
+servers:
+- url: http://localhost:8080
+tags: []
+paths:
+  /shops:
+    get:
+      tags:
+      - shops
+      summary: Shop 전체 조회
+      description: Shop 전체 조회
+      operationId: get-shops
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/shops16857538'
+              examples:
+                get-shops:
+                  value: |-
+                    {
+                      "code" : "A-2",
+                      "message" : "정보 조회",
+                      "data" : [ {
+                        "id" : 1,
+                        "name" : "Shop A",
+                        "address" : "도로명 주소 1",
+                        "detailAddress" : "상세 주소 1",
+                        "tier" : "bronze"
+                      }, {
+                        "id" : 2,
+                        "name" : "Shop B",
+                        "address" : "도로명 주소 2",
+                        "detailAddress" : "상세 주소 2",
+                        "tier" : "silver"
+                      }, {
+                        "id" : 3,
+                        "name" : "Shop C",
+                        "address" : "도로명 주소 3",
+                        "detailAddress" : "상세 주소 3",
+                        "tier" : "gold"
+                      } ]
+                    }
+    post:
+      tags:
+      - shops
+      summary: Shop 등록
+      description: Shop 등록
+      operationId: post-shops
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/shops-1721787786'
+            examples:
+              post-shops:
+                value: |-
+                  {
+                    "name" : "Shop A",
+                    "address" : "도로명 주소",
+                    "detailAddress" : "상세 주소"
+                  }
+      responses:
+        "201":
+          description: "201"
+          headers:
+            Location:
+              description: 리소스 위치
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/shops-1232842295'
+              examples:
+                post-shops:
+                  value: |-
+                    {
+                      "code" : "A-1",
+                      "message" : "생성됨",
+                      "data" : {
+                        "id" : 1,
+                        "name" : "Shop A",
+                        "address" : "도로명 주소",
+                        "detailAddress" : "상세 주소",
+                        "tier" : "bronze"
+                      }
+                    }
+  /shops/{shopId}:
+    get:
+      tags:
+      - shops
+      summary: Shop 단일 조회
+      description: Shop 단일 조회
+      operationId: get-shop
+      parameters:
+      - name: shopId
+        in: path
+        description: Shop ID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/shops-1232842295'
+              examples:
+                get-shop:
+                  value: |-
+                    {
+                      "code" : "A-2",
+                      "message" : "정보 조회",
+                      "data" : {
+                        "id" : 1,
+                        "name" : "Shop A",
+                        "address" : "도로명 주소",
+                        "detailAddress" : "상세 주소",
+                        "tier" : "bronze"
+                      }
+                    }
+  /shops/{shopId}:{shopAction}:
+    put:
+      tags:
+      - shops
+      summary: Shop 등급 변경
+      description: Shop 등급 변경
+      operationId: put-shop
+      parameters:
+      - name: shopId
+        in: path
+        description: Shop ID
+        required: true
+        schema:
+          type: string
+      - name: shopAction
+        in: path
+        description: |
+          upgrade: 업그레이드
+
+          downgrade: 다운그레이드
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/shops-1232842295'
+              examples:
+                put-shop:
+                  value: |-
+                    {
+                      "code" : "A-3",
+                      "message" : "정보 업데이트",
+                      "data" : {
+                        "id" : 1,
+                        "name" : "Shop A",
+                        "address" : "도로명 주소",
+                        "detailAddress" : "상세 주소",
+                        "tier" : "silver"
+                      }
+                    }
+components:
+  schemas:
+    shops16857538:
+      type: object
+      properties:
+        code:
+          type: string
+          description: API 응답 코드
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              address:
+                type: string
+                description: Shop 도로명 주소
+              tier:
+                type: string
+                description: Shop 등급
+              name:
+                type: string
+                description: Shop 이름
+              detailAddress:
+                type: string
+                description: Shop 상세 주소
+              id:
+                type: number
+                description: Shop ID
+        message:
+          type: string
+          description: API 응답 메시지
+    shops-1721787786:
+      type: object
+      properties:
+        address:
+          type: string
+          description: Shop 도로명 주소
+        name:
+          type: string
+          description: Shop 이름
+        detailAddress:
+          type: string
+          description: Shop 상세 주소
+    shops-1232842295:
+      type: object
+      properties:
+        code:
+          type: string
+          description: API 응답 코드
+        data:
+          type: object
+          properties:
+            address:
+              type: string
+              description: Shop 도로명 주소
+            tier:
+              type: string
+              description: Shop 등급
+            name:
+              type: string
+              description: Shop 이름
+            detailAddress:
+              type: string
+              description: Shop 상세 주소
+            id:
+              type: number
+              description: Shop ID
+        message:
+          type: string
+          description: API 응답 메시지

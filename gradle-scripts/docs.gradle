@@ -1,0 +1,35 @@
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+openapi3 {
+    server = 'http://localhost:8080'
+    title = 'REST API 문서'
+    description = 'REST API 문서'
+    version = '0.0.1'
+    format = 'yaml'
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
+}
+
+tasks.register('copyOasToSwagger', Copy) {
+    dependsOn("openapi3")
+
+    from("$buildDir/api-spec/openapi3.yaml")
+    into("src/main/resources/static/docs/swagger")
+}
+
+tasks.register('copyDocument', Copy) {
+    dependsOn asciidoctor
+
+    from("$buildDir/docs/asciidoc")
+    into("src/main/resources/static/docs/restdocs")
+}
+
+test {
+    outputs.dir snippetsDir
+}

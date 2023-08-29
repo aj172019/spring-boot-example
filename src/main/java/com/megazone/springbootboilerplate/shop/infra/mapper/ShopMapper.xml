@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.megazone.springbootboilerplate.shop.infra.mapper.ShopMapper">
+    <resultMap id="shopRowMapper" type="Shop">
+        <result property="id" column="shop_id"/>
+        <result property="name" column="shop_name"/>
+        <result property="tier" column="shop_tier"/>
+        <result property="tierType" column="shop_tier_code"/>
+        <association property="address" javaType="ShopAddress" resultMap="shopAddressRowMapper"/>
+    </resultMap>
+
+    <resultMap id="shopAddressRowMapper" type="ShopAddress">
+        <result property="address" column="shop_address"/>
+        <result property="detailAddress" column="shop_detail_address"/>
+    </resultMap>
+
+    <resultMap id="shopWithReviewsMapper" type="ShopWithReviewsQuery">
+        <id property="id" column="shop_id"/>
+        <result property="name" column="shop_name"/>
+        <collection property="reviews" ofType="ReviewQuery">
+            <id property="id" column="review_id"/>
+            <result property="contents" column="review_contents"/>
+        </collection>
+    </resultMap>
+
+    <select id="findShopReviewsById" resultMap="shopWithReviewsMapper">
+        SELECT s.shop_id, s.shop_name, r.review_id, r.review_contents
+        FROM shop s
+        LEFT JOIN review r ON s.shop_id = r.shop_id
+        WHERE s.shop_id = #{id}
+    </select>
+
+<!--    <insert id="save" parameterType="Shop" useGeneratedKeys="true" keyProperty="id">-->
+<!--        INSERT INTO shop (shop_name)-->
+<!--        VALUES (#{name})-->
+<!--    </insert>-->
+</mapper>
